@@ -14,7 +14,9 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // GetMaterialApp 으로 변경, from MaterialApp
     return GetMaterialApp(
+      // 화면이 하나라서 초기 바인딩으로 dependency injection 함
       initialBinding: TodoBinding(),
       title: 'TODOS',
       debugShowCheckedModeBanner: false,

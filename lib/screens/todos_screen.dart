@@ -155,6 +155,7 @@ class _SearchAndFilterTodoState extends State<SearchAndFilterTodo> {
         style: TextStyle(
           fontSize: 18.0,
           color: textColor(context, filter),
+          // fontWeight: textFontWeight(context, filter),
         ),
       ),
     );
@@ -165,6 +166,11 @@ class _SearchAndFilterTodoState extends State<SearchAndFilterTodo> {
     var currentFilter = clickedType; //context.watch<TodoFilter>().state.filter
     return currentFilter == filter ? Colors.blue : Colors.grey;
   }
+
+  // FontWeight textFontWeight(BuildContext context, Filter filter) {
+  //   var currentFilter = context.watch<TodoFilterState>().filter;
+  //   return currentFilter == filter ? FontWeight.bold : FontWeight.normal;
+  // }
 }
 
 class ShowTodos extends StatelessWidget {
@@ -189,7 +195,7 @@ class ShowTodos extends StatelessWidget {
     // final todos = context.watch<FilteredTodos>().state.filteredTodos;
 
     return Obx(() {
-      final currentTodos = Todos.to.todos;
+      final currentTodos = TodoList.to.todos;
 
       return ListView.separated(
         primary: false,
