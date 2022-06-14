@@ -4,14 +4,9 @@ import 'package:todo_test/controller/todo_list_controller.dart';
 
 import '../model/todo_model.dart';
 
-class TodosScreen extends StatefulWidget {
+class TodosScreen extends StatelessWidget {//StatefulWidget
   const TodosScreen({Key? key}) : super(key: key);
 
-  @override
-  State<TodosScreen> createState() => _TodosScreenState();
-}
-
-class _TodosScreenState extends State<TodosScreen> {
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -136,10 +131,9 @@ class SearchAndFilterTodo extends StatelessWidget {
     //, Filter filter
     return TextButton(
       onPressed: () {
+        // 일반적으로는 함수처리해야 함. 직접 접근하지 말것
         TodosFilter.to.todosFilter.value = filter;
-        // clickedType = filter;
         debugPrint('Clicked button $filter');
-        // setState(() {});
       },
       child: Obx(
         () => Text(
@@ -190,10 +184,9 @@ class ShowTodos extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // final todos = context.watch<FilteredTodos>().state.filteredTodos;
+    final currentTodos = FilteredTodos.to.filteredTodos;
 
     return Obx(() {
-      final currentTodos = FilteredTodos.to.filteredTodos;
-
       return ListView.separated(
         primary: false,
         shrinkWrap: true,
