@@ -4,7 +4,6 @@ import 'package:get/get.dart';
 import 'bindings/todo_binding.dart';
 import 'screens/todos_screen.dart';
 
-
 void main() {
   runApp(const MyApp());
 }

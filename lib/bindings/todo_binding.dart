@@ -7,5 +7,7 @@ class TodoBinding extends Bindings {
   void dependencies() {
     // dependency injection
     Get.put<TodoList>(TodoList());
+    Get.put<TodosFilter>(TodosFilter());
+    Get.put<FilteredTodos>(FilteredTodos());
   }
 }

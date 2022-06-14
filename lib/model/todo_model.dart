@@ -19,3 +19,9 @@ class Todo {
     return 'Todo(id: $id, desc: $desc, completed: $completed)';
   }
 }
+
+enum Filter {
+  all,
+  active,
+  completed,
+}
