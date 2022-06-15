@@ -4,7 +4,7 @@ import 'package:todo_test/controller/todo_list_controller.dart';
 
 import '../model/todo_model.dart';
 
-class TodosScreen extends StatelessWidget {//StatefulWidget
+class TodosScreen extends StatelessWidget {
   const TodosScreen({Key? key}) : super(key: key);
 
   @override
@@ -38,24 +38,26 @@ class TodoHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: const [
-        Text(
+      children: [
+        const Text(
           'TODO',
           style: TextStyle(fontSize: 40.0),
         ),
-        Text(
-          '0 items left',
-          style: TextStyle(
-            fontSize: 20.0,
-            color: Colors.redAccent,
-          ),
-        ),
+        Obx(() {
+          return Text(
+            '${ActiveCount.to.activeCount} items left',
+            style: const TextStyle(
+              fontSize: 20.0,
+              color: Colors.redAccent,
+            ),
+          );
+        }),
       ],
     );
   }
 }
 
-class CreateTodo extends StatefulWidget { //StatefulWidget//StatelessWidget
+class CreateTodo extends StatefulWidget {
   const CreateTodo({Key? key}) : super(key: key);
 
   @override
@@ -79,7 +81,7 @@ class _CreateTodoState extends State<CreateTodo> {
       onFieldSubmitted: (String? todoDesc) {
         debugPrint('CreateTodo Clicked: ${newTodoController.text}');
         if (todoDesc != null && todoDesc.trim().isNotEmpty) {
-          TodoList.to.addTodo(todoDesc: todoDesc);
+          TodosList.to.addTodo(todoDesc: todoDesc);
           newTodoController.clear();
         }
       },
@@ -107,11 +109,11 @@ class SearchAndFilterTodo extends StatelessWidget {
           ),
           onChanged: (String? newSearchTerm) {
             debugPrint('Search todos: $newSearchTerm');
-            // if (newSearchTerm != null) {
-            //   debounce.run(() {
-            //     context.read<TodoSearch>().setSearchTerm(newSearchTerm);
-            //   });
-            // }
+            if (newSearchTerm != null) {
+              // debounce.run(() {
+              TodosSearch.to.searchWord.value = newSearchTerm;
+              // });
+            }
           },
         ),
         const SizedBox(height: 10.0),
@@ -214,7 +216,7 @@ class TodoItem extends StatelessWidget {
         value: todo.completed,
         onChanged: (bool? checked) {
           debugPrint('clicked toggle button~~');
-          TodoList.to.toggleTodo(todo.id);
+          TodosList.to.toggleTodo(id: todo.id);
         },
       ),
       title: Text(todo.desc),

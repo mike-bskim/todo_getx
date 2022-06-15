@@ -1,8 +1,22 @@
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../model/todo_model.dart';
 
-class TodoList extends GetxController {
+class TodosFilter extends GetxController {
+  Rx<Filter> todosFilter = Filter.all.obs;
+
+  static TodosFilter get to => Get.find();
+}
+
+class TodosSearch extends GetxController {
+  RxString searchWord = ''.obs;
+
+  static TodosSearch get to => Get.find();
+}
+
+// 클래스명 변경함 TodoList => TodosList
+class TodosList extends GetxController {
   // 샘플 데이터 생성
   RxList<Todo> todos = <Todo>[
     Todo(id: '1', desc: 'Clean the room', completed: true),
@@ -10,7 +24,7 @@ class TodoList extends GetxController {
     Todo(id: '3', desc: 'Wash the dish'),
   ].obs;
 
-  static TodoList get to => Get.find();
+  static TodosList get to => Get.find();
 
   void addTodo({required String todoDesc}) {
     int? newNum;
@@ -23,7 +37,11 @@ class TodoList extends GetxController {
     todos.add(Todo(id: newNum.toString(), desc: todoDesc));
   }
 
-  void toggleTodo(String id) {
+  void deleteTodo({required String id}) {
+    todos.assignAll(todos.where((t) => t.id != id).toList());
+  }
+
+  void toggleTodo({required String id}) {
     todos.assignAll(todos.map((todo) {
       return todo.id == id
           ? Todo(
@@ -34,19 +52,42 @@ class TodoList extends GetxController {
           : todo;
     }).toList());
   }
+
+  void editTodo({required String id, required String desc}) {
+    todos.assignAll(todos.map((todo) {
+      return todo.id == id
+          ? Todo(
+              id: id,
+              desc: desc,
+              completed: todo.completed,
+            )
+          : todo;
+    }).toList());
+  }
 }
 
-class TodosFilter extends GetxController {
-  Rx<Filter> todosFilter = Filter.all.obs;
+class ActiveCount extends GetxController {
+  final todos = TodosList.to.todos;
+  RxInt activeCount = 0.obs;
 
-  static TodosFilter get to => Get.find();
+  static ActiveCount get to => Get.find();
+
+  @override
+  void onInit() {
+    activeCount.value = todos.where((todo) => !todo.completed).toList().length;
+    ever(todos, (_) {
+      activeCount.value =
+          todos.where((todo) => !todo.completed).toList().length;
+      debugPrint('active count: ${activeCount.value}');
+    });
+    super.onInit();
+  }
 }
 
 class FilteredTodos extends GetxController {
-  final todos = TodoList.to.todos;
+  final todos = TodosList.to.todos;
   final filter = TodosFilter.to.todosFilter;
-
-  // final search = TodosSearch.to.searchTerm;
+  final search = TodosSearch.to.searchWord;
 
   RxList<Todo> filteredTodos = <Todo>[].obs;
 
@@ -54,10 +95,10 @@ class FilteredTodos extends GetxController {
 
   @override
   void onInit() {
+    // 초기에 화면에 표시할 리스트를 filteredTodos 에 할당.
     filteredTodos.assignAll(todos);
 
-    everAll([todos, filter], (_) {
-      // everAll([todos, search, filter], (_) {
+    everAll([todos, search, filter], (_) {
       List<Todo> tempTodos;
 
       switch (filter.value) {
@@ -73,10 +114,10 @@ class FilteredTodos extends GetxController {
           break;
       }
 
-      // if (search.value.isNotEmpty) {
-      //   tempTodos =
-      //       tempTodos.where((t) => t.text.contains(search.value)).toList();
-      // }
+      if (search.value.isNotEmpty) {
+        tempTodos =
+            tempTodos.where((t) => t.desc.toLowerCase().contains(search.value)).toList();
+      }
 
       filteredTodos.assignAll(tempTodos);
     });
