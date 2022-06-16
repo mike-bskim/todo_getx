@@ -11,8 +11,19 @@ class TodosFilter extends GetxController {
 
 class TodosSearch extends GetxController {
   RxString searchWord = ''.obs;
+  late TextEditingController searchWordController;
 
   static TodosSearch get to => Get.find();
+  @override
+  void onInit() {
+    searchWordController = TextEditingController();
+    super.onInit();
+  }
+  @override
+  void onClose() {
+    searchWordController.dispose();
+    super.onClose();
+  }
 }
 
 // 클래스명 변경함 TodoList => TodosList

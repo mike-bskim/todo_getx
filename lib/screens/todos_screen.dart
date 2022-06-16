@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:todo_test/controller/todo_list_controller.dart';
 
+import '../controller/todo_focus_controller.dart';
+import '../controller/todo_list_controller.dart';
 import '../model/todo_model.dart';
 
 class TodosScreen extends StatelessWidget {
@@ -102,6 +103,8 @@ class SearchAndFilterTodo extends StatelessWidget {
     return Column(
       children: [
         TextFormField(
+// 신규 추가한 controller
+          controller: TodosSearch.to.searchWordController,
           decoration: const InputDecoration(
             labelText: 'Search todos',
             border: InputBorder.none,
@@ -231,66 +234,55 @@ class ShowTodos extends StatelessWidget {
   }
 }
 
-class TodoItem extends StatefulWidget {
+class TodoItem extends StatelessWidget {
   final Todo todo;
 
   const TodoItem({Key? key, required this.todo}) : super(key: key);
 
   @override
-  State<TodoItem> createState() => _TodoItemState();
-}
-
-class _TodoItemState extends State<TodoItem> {
-  final itemFocusNode = FocusNode();
-  final textFieldFocusNode = FocusNode();
-  final textEditingController = TextEditingController();
-
-  @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 2, vertical: 1),
-      child: Focus(
-        focusNode: itemFocusNode,
-        onFocusChange: (value) {
-          // if value is true, it get the focus
-          if (value) {
-            textEditingController.text = widget.todo.desc;
-            debugPrint('got the focus: "${widget.todo.desc}"');
-          } else {
-            TodosList.to.editTodo(
-              id: widget.todo.id,
-              desc: textEditingController.text,
-            );
-            debugPrint('lost the focus: "${widget.todo.desc}"');
-          }
-        },
-        child: ListTile(
-          onTap: () {
-            debugPrint('click for editing~~');
-            setState(() {
-              // 이건 focus 취득 및 타이틀을 텍스트 또는 텍스트필드로 변환하는 기능
-              itemFocusNode.requestFocus();
-              // 아래는 수정시, 텍스트필드의 autofocus 및 키보드 자동로딩용
-              // 없어도 동작에는 문제가 없음, 약간 불편한 화면처리 정도임
-              textFieldFocusNode.requestFocus();
-            });
-          },
-          leading: Checkbox(
-            value: widget.todo.completed,
-            onChanged: (bool? checked) {
-              debugPrint('clicked toggle button~~');
-              TodosList.to.toggleTodo(id: widget.todo.id);
+    return GetBuilder<TodoFocusController>(
+      builder: (controller) {
+        return Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 2, vertical: 1),
+          child: Focus(
+            focusNode: controller.itemFocusNode,
+            onFocusChange: (value) {
+              // if value is true, it get the focus
+              if (value) {
+                controller.textEditingController.text = todo.desc;
+                debugPrint('got the focus: "${todo.desc}"');
+              } else {
+                TodosList.to.editTodo(
+                  id: todo.id,
+                  desc: controller.textEditingController.text,
+                );
+                debugPrint('lost the focus: "${todo.desc}"');
+              }
             },
+            child: ListTile(
+              onTap: () {
+                debugPrint('click for editing~~');
+                controller.requestFocus();
+              },
+              leading: Checkbox(
+                value: todo.completed,
+                onChanged: (bool? checked) {
+                  debugPrint('clicked toggle button~~');
+                  TodosList.to.toggleTodo(id: todo.id);
+                },
+              ),
+              title: controller.itemFocusNode.hasFocus
+                  ? TextField(
+                      controller: controller.textEditingController,
+                      autofocus: true,
+                      focusNode: controller.textFieldFocusNode,
+                    )
+                  : Text(todo.desc),
+            ),
           ),
-          title: itemFocusNode.hasFocus
-              ? TextField(
-                  controller: textEditingController,
-                  autofocus: true,
-                  focusNode: textFieldFocusNode,
-                )
-              : Text(widget.todo.desc),
-        ),
-      ),
+        );
+      },
     );
   }
 }
